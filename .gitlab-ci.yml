@@ -1,0 +1,60 @@
+variables:
+  TF_STATE_NAME: v1.1
+  TF_ROOT: terraform
+
+image:
+  name: hashicorp/terraform
+  entrypoint: [""]
+
+before_script:
+  - terraform --version
+  - cd $TF_ROOT
+  - terraform init -backend-config="address=http://35.216.41.127/api/v4/projects/3/terraform/state/$TF_STATE_NAME" -backend-config="lock_address=http://35.216.41.127/api/v4/projects/3/terraform/state/$TF_STATE_NAME/lock" -backend-config="unlock_address=http://35.216.41.127/api/v4/projects/3/terraform/state/$TF_STATE_NAME/lock" -backend-config="username=bolim" -backend-config="password=$TOKEN" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
+
+
+cache:
+  paths:
+    - .terraform
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+  only:
+    changes:
+      - "*.yml"
+      - "*.tf"
+      - "**/*.tf"
+
+plan:
+  stage: plan
+  script:
+    - terraform plan
+  dependencies:
+    - validate
+  only:
+    changes:
+      - "*.yml"
+      - "*.tf"
+      - "**/*.tf"
+      - "**/*.tfvars"
+
+apply:
+  stage: apply
+  script:
+    - terraform apply -auto-approve
+  dependencies:
+    - plan
+  when: manual
+
+destroy: 
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve
+  when: manual 
