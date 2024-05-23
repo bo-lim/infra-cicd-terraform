@@ -1,6 +1,8 @@
 data "google_client_config" "default" {}
 
 terraform {
+  backend "http" {
+  }
   required_providers {
     google = {
       source = "hashicorp/google"
@@ -20,7 +22,7 @@ terraform {
 }
 
 provider "google" {
-  project = "gitlab-bolim"
+  project = var.project_id
   region = var.region
 }
 
@@ -57,8 +59,7 @@ module "gke" {
   #enable_private_nodes       = false # false로 해야 외부 포트가 열림
   #master_ipv4_cidr_block     = "10.0.0.0/28"
   deletion_protection        = false
-  service_account            = "terraform@gitlab-bolim.iam.gserviceaccount.com"
-  
+  service_account            = var.gcp_service_account
   node_pools = [
     {
       name            = "default-node-pool"
@@ -75,11 +76,6 @@ module "gke" {
       auto_upgrade    = true
       enable_autoscaling = true
       max_surge       = 3
-      #node_config = {
-      #  metadata = {
-      #    startup_script = "apt-get update && apt-get install ca-certificates curl && install -m 0755 -d /etc/apt/keyrings && curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && chmod a+r /etc/apt/keyrings/docker.asc && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && apt-get update && apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && systemctl enable docker && systemctl start docker"
-      #  }
-      #}
     }
   ]
 

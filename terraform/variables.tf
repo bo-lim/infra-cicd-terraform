@@ -40,6 +40,12 @@ variable "cluster_subnet_name" {
   default     = "public-subnet-01"
 }
 
+variable "gcp_service_account" {
+  type        = string
+  description = "GCP service account"
+  default     = "terraform@gitlab-bolim.iam.gserviceaccount.com"
+}
+
 # Cluster variables
 
 
@@ -76,19 +82,4 @@ variable "ip_range_services_name" {
   type        = string
   description = "The secondary ip ranges for services"
   default     = "subnet-01-services"
-}
-
-# ------------------------------------------------------------
-# Jenkins Settings
-# ------------------------------------------------------------
-variable "jenkins_admin_user" {
-  type        = string
-  description = "Admin user of the Jenkins Application."
-  default     = "admin"
-}
-
-variable "jenkins_admin_password" {
-  type        = string
-  description = "Admin password of the Jenkins Application."
-  default     = "k8spass#"
 }

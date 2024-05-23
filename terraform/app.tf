@@ -67,8 +67,8 @@ resource "kubernetes_persistent_volume" "mongo_data_pv" {
       storage = "5Gi"
     }
 
-    access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard-rwo"
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "standard"
 
     persistent_volume_source {
       host_path {
@@ -87,7 +87,8 @@ resource "kubernetes_persistent_volume_claim" "mongo_data" {
   }
 
   spec {
-    access_modes = ["ReadWriteOnce"]
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "standard"
     resources {
       requests = {
         storage = "5Gi"
@@ -125,6 +126,7 @@ resource "kubernetes_namespace" "ingress_nginx" {
   }
   depends_on = [module.gke]
 }
+
 resource "kubernetes_service_account" "ingress_nginx" {
   metadata {
     name      = "ingress-nginx"
